@@ -23,17 +23,17 @@ public class BlockChain {
 
     }
 
-    public void generateBlock() {
+    public void generateBlock(int countZero) {
 
         if (checkBlockChainTrue()) {
 
             if (this.blockList.isEmpty()) {
 
-                this.blockList.add(Block.getBlockInstance("0", new Date().getTime()));
+                this.blockList.add(Block.getBlockInstance("0", new Date().getTime(),countZero));
 
             } else {
 
-                Block nextBlock = Block.getBlockInstance(getLastBlockHash(), new Date().getTime());
+                Block nextBlock = Block.getBlockInstance(getLastBlockHash(), new Date().getTime(), countZero);
                 this.blockList.add(nextBlock);
 
             }

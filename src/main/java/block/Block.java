@@ -2,34 +2,37 @@ package block;
 
 import util.StringUtil;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.Random;
 
-public class Block {
+public class Block implements Serializable {
 
     private final int id;
-    private static int nextId = 1;
+//    private static int nextId = 1;
     long timeStamp;
     private final String hash;
     private final String previousBlockHash;
     private int magicNumber;
     private int secondsGeneratingBlock;
 
-    {
-        id = nextId;
-        nextId++;
-    }
-
-    private Block(String previousBlockHash, long timeStamp, int countZero) {
+    private Block(String previousBlockHash, long timeStamp, int countZero, int id) {
         this.previousBlockHash = previousBlockHash;
         this.timeStamp = timeStamp;
         this.hash = this.generateHash(countZero);
+        this.id = ++id;
+//        nextId = ++id;
     }
 
-    public static Block getBlockInstance(String previousBlockHash, long timeStamp, int countZero) {
+    public static Block getBlockInstance(String previousBlockHash, long timeStamp, int countZero, int id) {
 
-        return new Block(previousBlockHash, timeStamp, countZero);
+        return new Block(previousBlockHash, timeStamp, countZero, id);
     }
+
+    public int getId() {
+        return id;
+    }
+
     public void setSecondsGeneratingBlock(int secondsGeneratingBlock) {
         this.secondsGeneratingBlock = secondsGeneratingBlock;
     }
@@ -57,7 +60,7 @@ public class Block {
 
     @Override
     public String toString() {
-        return "block.Block:" + "\n"
+        return "Block:" + "\n"
                 + "Id: " + this.id + "\n"
                 + "Timestamp: " + this.timeStamp + "\n"
                 + "Magic number: " + this.magicNumber + "\n"

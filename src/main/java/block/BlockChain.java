@@ -1,18 +1,24 @@
 package block;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.*;
+
+import util.SerializationUtilImpl;
 import util.StringUtil;
 
-public class BlockChain {
+public class BlockChain implements Serializable {
 
-    private List<Block> blockList;
+    private Deque<Block> blockList;
     private String currentBlockChainHash;
+    private static final long serialVersionUID = 2134;
+
+     transient private SerializationUtilImpl serializationUtil = new SerializationUtilImpl();
 
     private BlockChain() {
 
-        this.blockList = new LinkedList<>();
+        this.blockList = new ArrayDeque<>();
         setCurrentBlockChainHash(calculateSumHash());
 
     }
@@ -23,22 +29,24 @@ public class BlockChain {
 
     }
 
-    public void generateBlock(int countZero) {
+    public void generateBlock(int countZero, String fileName) {
 
         if (checkBlockChainTrue()) {
 
             if (this.blockList.isEmpty()) {
 
-                this.blockList.add(Block.getBlockInstance("0", new Date().getTime(),countZero));
+                this.blockList.add(Block.getBlockInstance("0", new Date().getTime(),countZero, 0));
 
             } else {
-
-                Block nextBlock = Block.getBlockInstance(getLastBlockHash(), new Date().getTime(), countZero);
+                Block lastBlock = blockList.getLast();
+                Block nextBlock = Block.getBlockInstance(getLastBlockHash(), new Date().getTime(), countZero, lastBlock.getId());
                 this.blockList.add(nextBlock);
 
             }
 
             setCurrentBlockChainHash(calculateSumHash());
+
+            serializationUtil.serialize(this, fileName);
         }
 
     }
@@ -51,12 +59,12 @@ public class BlockChain {
 
     private String getLastBlockHash() {
 
-        Block lastBlock = this.blockList.get(this.blockList.size() - 1);
+        Block lastBlock = this.blockList.getLast();
         return lastBlock.getHash();
 
     }
 
-    public List<Block> getBlockChain() {
+    public Deque<Block> getBlockChain() {
 
         return blockList;
 
@@ -77,6 +85,11 @@ public class BlockChain {
 
         this.currentBlockChainHash = currentBlockChainHash;
 
+    }
+
+    private void readObject(ObjectInputStream objectInput) throws Exception {
+        objectInput.defaultReadObject();
+        this.serializationUtil = new SerializationUtilImpl();
     }
 
 }
